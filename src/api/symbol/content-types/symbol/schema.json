@@ -1,0 +1,22 @@
+{
+  "kind": "collectionType",
+  "collectionName": "symbols",
+  "info": {
+    "singularName": "symbol",
+    "pluralName": "symbols",
+    "displayName": "Symbol"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "data": {
+      "type": "json",
+      "required": true
+    }
+  }
+}
