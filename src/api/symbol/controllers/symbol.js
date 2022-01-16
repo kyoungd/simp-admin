@@ -8,21 +8,20 @@ const { createCoreController } = require('@strapi/strapi').factories;
 
 module.exports = createCoreController('api::symbol.symbol', ({ strapi }) => ({
 
-    // Method 3: Replacing a core action
-    async findOne(ctx) {
-        const { id } = ctx.params;  // pass in the name field
-        const { query } = ctx;
+    // async findOne(ctx) {
+    //     const { id } = ctx.params;  // pass in the name field
+    //     const { query } = ctx;
 
-        const entity = await strapi.db.query('api::symbol.symbol').findOne({
-            select: ['data'],
-            where: { name: id },
-            populate: { category: true },
-        });
-        // const entity = await strapi.service('api::symbol.symbol').findOne(id, query);
-        const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
+    //     const entity = await strapi.db.query('api::symbol.symbol').findOne({
+    //         select: ['data'],
+    //         where: { name: id },
+    //         populate: { category: true },
+    //     });
+    //     // const entity = await strapi.service('api::symbol.symbol').findOne(id, query);
+    //     const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
 
-        return this.transformResponse(sanitizedEntity);
-    },
+    //     return this.transformResponse(sanitizedEntity);
+    // },
 
     async update(ctx) {
         const { id } = ctx.params;
