@@ -7,36 +7,49 @@
 const { createCoreController } = require('@strapi/strapi').factories;
 
 module.exports = createCoreController('api::favorite.favorite', ({ strapi }) => ({
-    // Method 3: Replacing a core action
-    async findOne(ctx) {
+
+    async find(ctx) {
         const { id } = ctx.state.user;
-        const { query } = ctx;
-
-        const entity = await strapi.service('api::favorite.favorite').findOne(id, query);
-        const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
-
-        return this.transformResponse(sanitizedEntity);
-    },
-
-    async create(ctx) {
         // some logic here
-        const response = await super.create(ctx);
+        const query = {
+            user: {
+                id: {
+                    $eq: id
+                }
+            }
+        }
+        ctx.query = query;
+        const { data, meta } = await super.find(ctx);
         // some more logic
 
-        return response;
+        return { data, meta };
     },
-
+    
     async update(ctx) {
         const { id } = ctx.state.user;
         const { body } = ctx.request;
 
-        const entity = await strapi.entityService.update('api::favorite.favorite', id, {
+        const entry = await strapi.db.query('api::favorite.favorite').findOne({
+            where: { user: id + 5 },
+        });
+        if (entry) {
+            const entity = await strapi.entityService.update('api::favorite.favorite', id, {
+                    data: {
+                        data: body,
+                    },
+                });
+            const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
+            return this.transformResponse(sanitizedEntity);
+        } else {
+            const entity2 = await strapi.db.query('api::favorite.favorite').create({
                 data: {
                     data: body,
+                    user: id
                 },
             });
-        const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
-        return this.transformResponse(sanitizedEntity);
+            const sanitizedEntity = await this.sanitizeOutput(entity2, ctx);
+            return this.transformResponse(sanitizedEntity);
+        }
     }
 
 }));
