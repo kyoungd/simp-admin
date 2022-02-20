@@ -33,7 +33,7 @@ module.exports = createCoreController('api::favorite.favorite', ({ strapi }) => 
             where: { user: id },
         });
         if (entry) {
-            const entity = await strapi.entityService.update('api::favorite.favorite', id, {
+            const entity = await strapi.entityService.update('api::favorite.favorite', entry.id, {
                 data: {
                     data: body,
                 },
