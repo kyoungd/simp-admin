@@ -115,4 +115,7 @@ build
 
 ######
 ## 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
+SENDGRID_API_KEY=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
+SENDGRID_EMAIL_FROM=young@ecom-live.com
+SENDGRID_REPLY_TO=young@ecom-live.com
 ######
