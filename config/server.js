@@ -1,7 +1,8 @@
 module.exports = ({ env }) => ({
   host: env('HOST', '0.0.0.0'),
   port: env.int('PORT', 1337),
-  // url: "https://simp-admin.herokuapp.com",
+  proxy: true,
+  url: "https://simp-admin.herokuapp.com",
   app: {
     keys: env.array("APP_KEYS"),
   },
