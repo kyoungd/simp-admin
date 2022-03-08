@@ -36,5 +36,4 @@ module.exports = createCoreController('api::symbol.symbol', ({ strapi }) => ({
         return this.transformResponse(sanitizedEntity);
     }
 
-
 }));
