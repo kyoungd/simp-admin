@@ -11,18 +11,11 @@ module.exports = createCoreController('api::favorite.favorite', ({ strapi }) => 
     async find(ctx) {
         const { id } = ctx.state.user;
         // some logic here
-        const query = {
-            user: {
-                id: {
-                    $eq: id
-                }
-            }
-        }
-        ctx.query = query;
-        const { data, meta } = await super.find(ctx);
-        // some more logic
-
-        return { data, meta };
+        const entity = await strapi.db.query('api::favorite.favorite').findOne({
+            where: { user: id },
+        });
+        const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
+        return this.transformResponse(sanitizedEntity);
     },
     
     async create(ctx) {
