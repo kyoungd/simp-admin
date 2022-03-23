@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "realtimes",
+  "info": {
+    "singularName": "realtime",
+    "pluralName": "realtimes",
+    "displayName": "Realtime",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "datatype": {
+      "type": "string"
+    },
+    "timeframe": {
+      "type": "string"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "data_at": {
+      "type": "datetime"
+    },
+    "data": {
+      "type": "json"
+    }
+  }
+}
