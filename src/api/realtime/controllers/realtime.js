@@ -32,9 +32,17 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
     async create(ctx) {
         const { body } = ctx.request;
 
-        const entity2 = await strapi.db.query('api::realtime.realtime').create({
-            data: body
-        });
+        let entity2;
+        for (const entity of body) {
+            entity2 = await strapi.db.query('api::realtime.realtime').create({
+                data: {
+                    "datatype": "VSA",
+                    "timeframe": "MIN15",
+                    "symbol": entity.symbol,
+                    "data": { "vsa": entity.vsa }
+                }
+            });
+        }
         const sanitizedEntity = await this.sanitizeOutput(entity2, ctx);
         return this.transformResponse(sanitizedEntity);
     }
