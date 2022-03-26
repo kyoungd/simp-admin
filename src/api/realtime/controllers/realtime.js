@@ -37,7 +37,7 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
             entity2 = await strapi.db.query('api::realtime.realtime').create({
                 data: {
                     "datatype": "VSA",
-                    "timeframe": "MIN15",
+                    "timeframe": entity.timeframe,
                     "symbol": entity.symbol,
                     "data": { "vsa": entity.vsa }
                 }
