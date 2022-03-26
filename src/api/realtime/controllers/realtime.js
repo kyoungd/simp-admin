@@ -18,13 +18,27 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
 
         // some logic here
         const readFrom = timefrom(timeframe);
-        const query = {
-            datatype,
-            timeframe,
-            data_at: { $gte: readFrom.toDate() },
-            _sort: 'symbol:asc, data_at:desc',
-        }
-        const entities = await strapi.services['api::realtime.realtime'].find(query);
+        // const query = {
+        //     datatype,
+        //     timeframe,
+        //     data_at: { $gte: readFrom },
+        //     _sort: 'symbol:asc, data_at:desc',
+        // }
+        // const entities = await strapi.services['api::realtime.realtime'].find(query);
+        
+        const result = await strapi.entityService.findMany('api::realtime.realtime', {
+            filters: {
+                $and: [ 
+                    { datatype: datatype }, 
+                    { timeframe: timeframe },
+                    {
+                        createdAt: { $gt: readFrom.toISOString() },
+                    },
+                ],
+            },
+            sort: [{ symbol: 'asc' }, { createdAt: 'desc' }],
+        });
+        const entities = result.filter(entity => entity.data.vsa > 0)
         const sanitizedEntity = await this.sanitizeOutput(entities, ctx);
         return this.transformResponse(sanitizedEntity);
     },
@@ -48,4 +62,3 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
     }
 
 }));
-
