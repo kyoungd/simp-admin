@@ -32,7 +32,7 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
                     { datatype: datatype }, 
                     { timeframe: timeframe },
                     {
-                        createdAt: { $gt: readFrom.toISOString() },
+                        data_at: { $gt: readFrom.toISOString() },
                     },
                 ],
             },
@@ -53,7 +53,8 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
                     "datatype": "VSA",
                     "timeframe": entity.timeframe,
                     "symbol": entity.symbol,
-                    "data": { "vsa": entity.vsa }
+                    "data": { "vsa": entity.vsa },
+                    "data_at": new Data()
                 }
             });
         }
