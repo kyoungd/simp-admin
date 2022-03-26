@@ -59,6 +59,22 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
         }
         const sanitizedEntity = await this.sanitizeOutput(entity2, ctx);
         return this.transformResponse(sanitizedEntity);
+    },
+
+    async delete(ctx) {
+        const { id } = ctx.state.user;
+        const { datatype } = ctx.query;
+        // some logic here
+        if (ctx.state.user.role.type !== 'sysops') {
+            return ctx.unauthorized();
+        };
+        const entity2 = await strapi.db.query('api::realtime.realtime').deleteMany({
+            where: {
+                datatype: datatype,
+            },
+        });
+        const sanitizedEntity = await this.sanitizeOutput(entity2, ctx);
+        return this.transformResponse(sanitizedEntity);
     }
 
 }));
