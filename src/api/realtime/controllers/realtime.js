@@ -53,7 +53,7 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
                     "datatype": "VSA",
                     "timeframe": entity.timeframe,
                     "symbol": entity.symbol,
-                    "data": { "vsa": entity.vsa },
+                    "data": { "vsa": entity.vsa, "price": entity.price },
                     "data_at": new Date()
                 }
             });
