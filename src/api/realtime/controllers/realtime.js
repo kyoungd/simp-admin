@@ -46,14 +46,28 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
     async create(ctx) {
         const { body } = ctx.request;
 
+        const getData = (row) => {
+            try {
+                delete row['datatype'];
+                delete row['timeframe'];
+                delete row['symbol'];
+                return row;
+            }
+            catch (e) {
+                console.log(e);
+            }
+            return row;
+        }
+
         let entity2;
         for (const entity of body) {
+            const data = getData(entity);
             entity2 = await strapi.db.query('api::realtime.realtime').create({
                 data: {
-                    "datatype": "VSA",
+                    "datatype": entity.datatype,
                     "timeframe": entity.timeframe,
                     "symbol": entity.symbol,
-                    "data": { "vsa": entity.vsa, "price": entity.price },
+                    "data": data,
                     "data_at": new Date()
                 }
             });
