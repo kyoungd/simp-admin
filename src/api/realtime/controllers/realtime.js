@@ -61,12 +61,15 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
 
         let entity2;
         for (const entity of body) {
+            const datatype = entity.datatype;
+            const timeframe = entity.timeframe;
+            const symbol = entity.symbol;
             const data = getData(entity);
             entity2 = await strapi.db.query('api::realtime.realtime').create({
                 data: {
-                    "datatype": entity.datatype,
-                    "timeframe": entity.timeframe,
-                    "symbol": entity.symbol,
+                    "datatype": datatype,
+                    "timeframe": timeframe,
+                    "symbol": symbol,
                     "data": data,
                     "data_at": new Date()
                 }
