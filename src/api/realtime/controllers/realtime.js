@@ -26,7 +26,7 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
         // }
         // const entities = await strapi.services['api::realtime.realtime'].find(query);
         
-        const result = await strapi.entityService.findMany('api::realtime.realtime', {
+        const entities = await strapi.entityService.findMany('api::realtime.realtime', {
             filters: {
                 $and: [ 
                     { datatype: datatype }, 
@@ -38,7 +38,6 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
             },
             sort: [{ symbol: 'asc' }, { createdAt: 'desc' }],
         });
-        const entities = result.filter(entity => entity.data.vsa > 0)
         const sanitizedEntity = await this.sanitizeOutput(entities, ctx);
         return this.transformResponse(sanitizedEntity);
     },
