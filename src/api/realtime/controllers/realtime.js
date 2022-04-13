@@ -8,7 +8,10 @@ const moment = require('moment');
 const { createCoreController } = require('@strapi/strapi').factories;
 
 const timefrom = (timeframe) => {
-    return moment().subtract(15, 'minutes');
+    if (timeframe === '5Min')
+        return moment().subtract(5, 'minutes');
+    else
+        return moment().subtract(15, 'minutes');
 }
 
 module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => ({
