@@ -31,8 +31,8 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
         const entities = await strapi.entityService.findMany('api::realtime.realtime', {
             filters: {
                 $and: [ 
+                    // { timeframe: timeframe },
                     { datatype: datatype }, 
-                    { timeframe: timeframe },
                     {
                         data_at: { $gt: readFrom.toISOString() },
                     },
