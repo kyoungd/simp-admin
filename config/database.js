@@ -14,6 +14,7 @@
 
 // postgres://{user}:{password}@{hostname}:{port}/{database-name}
 // DATABASE_URL=postgres://postgres:Service$11@127.0.0.1:5432/simp-admin
+
 const parse = require('pg-connection-string').parse;
 const config = parse(process.env.DATABASE_URL);
 module.exports = ({ env }) => ({
