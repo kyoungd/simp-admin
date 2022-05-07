@@ -7,8 +7,8 @@
 const moment = require('moment');
 const { createCoreController } = require('@strapi/strapi').factories;
 
-const tf5 = 'Min5'
-const tf15 = 'Min15'
+const tf5 = '5Min'
+const tf15 = '15Min'
 
 const timefrom = (timeframe) => {
     if (timeframe === tf5)
@@ -31,24 +31,25 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
         // }
         // const entities = await strapi.services['api::realtime.realtime'].find(query);
         
-        const entities1 = await strapi.entityService.findMany('api::realtime.realtime', {
+        const entities = await strapi.entityService.findMany('api::realtime.realtime', {
             filters: {
+                
                 $or: [
                     {
                         $and: [
                             { datatype: datatype },
-                            { timeframe: timefrom(tf15) },
+                            { timeframe: tf15 },
                             {
-                                data_at: { $gt: timefrom(tf15) },
+                                data_at: { $gt: timefrom(tf15).toISOString() },
                             },
                         ]
                     },
                     {
                         $and: [
                             { datatype: datatype },
-                            { timeframe: timefrom(tf5) },
+                            { timeframe: tf5 },
                             {
-                                data_at: { $gt: timefrom(tf5) },
+                                data_at: { $gt: timefrom(tf5).toISOString() },
                             },
                         ]
                     }
