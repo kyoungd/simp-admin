@@ -16,7 +16,8 @@ const fetchSummary = (entities) => {
             const source = news.newsitem.data.source;
             const summary = news.newsitem.data.summary;
             const headline = news.newsitem.data.headline;
-            results.push({ news_on, url, author, source, summary, headline });
+            const sentiment = news.newsitem.data.sentiment;
+            results.push({ news_on, url, author, source, summary, headline, sentiment });
         }
         catch (e) {
             console.log(e);
