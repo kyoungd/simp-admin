@@ -1,0 +1,23 @@
+{
+  "kind": "collectionType",
+  "collectionName": "newsitems",
+  "info": {
+    "singularName": "newsitem",
+    "pluralName": "newsitems",
+    "displayName": "newsitem",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nid": {
+      "type": "integer",
+      "unique": true
+    },
+    "data": {
+      "type": "json"
+    }
+  }
+}

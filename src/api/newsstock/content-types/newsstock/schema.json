@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "newsstocks",
+  "info": {
+    "singularName": "newsstock",
+    "pluralName": "newsstocks",
+    "displayName": "newsstock",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "symbol": {
+      "type": "string"
+    },
+    "nid": {
+      "type": "integer",
+      "required": true,
+      "unique": false
+    },
+    "newsitem": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::newsitem.newsitem"
+    },
+    "news_on": {
+      "type": "datetime"
+    }
+  }
+}
