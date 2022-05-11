@@ -5,10 +5,55 @@
  */
 
 const { createCoreController } = require('@strapi/strapi').factories;
+const moment = require('moment');
+const _ = require('lodash');
+const { create } = require('lodash');
+
+const timefrom = () => {
+    let workday = moment();
+    let day = workday.day();
+    let diff = 1;  // returns yesterday
+    if (day == 0 || day == 1) {  // is Sunday or Monday
+        diff = day + 2;  // returns Friday
+    }
+    let midnight = workday.subtract(diff, 'days');
+    return midnight.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+}
+
+const filterTop5Entities = (entities) => {
+    const rows = []
+    const createdOn = timefrom();
+    for (let row of entities) {
+        if (row.created_at >= createdOn) rows.append(row)
+    }
+    return rows;
+}
+
+const filterTop5 = (entities) => {
+    const rows = _.map(entities, 'data');
+    const sorted = _.orderBy(rows, ['sentiment'], ['asc']);
+    const top5 = sorted.splice(0, 5);
+    const bottom5 = sorted.splice(sorted.length-5, 5);
+    const result10 = top5.concat(bottom5).reverse();
+    const result = _.uniqBy(result10, 'id');
+    return result;
+}
 
 module.exports = createCoreController('api::newsitem.newsitem', ({ strapi }) => ({
 
-    // const data = '{"T":"n","id":24919710,"headline":"Granite Wins $90M Construction Manager/General Contractor Project In Northern California","summary":"Granite (NYSE:GVA) announced today that it has been selected by the California Department of Transportation (Caltrans) as the Construction Manager/General Contractor (CM/GC) for the approximately $90 million State Route","author":"Benzinga Newsdesk","created_at":"2022-01-05T22:30:29Z","updated_at":"2022-01-05T22:30:30Z","url":"https://www.benzinga.com/news/22/01/24919710/granite-wins-90m-construction-managergeneral-contractor-project-in-northern-california","content":"\u003cp\u003eGranite (NYSE:...","symbols":["GVA"],"source":"benzinga"}'
+    async find(ctx) {
+        const { query } = ctx;
+
+        // some logic here
+        const entities = await strapi.db.query('api::newsitem.newsitem').findMany({
+            where: {
+                created_at: { $gte: timefrom().toISOString() },
+            }
+        });
+        const entity = filterTop5(entities);
+        const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
+        return this.transformResponse(sanitizedEntity);
+    },
 
     async create(ctx) {
         const { body } = ctx.request;
