@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "dailies",
+  "info": {
+    "singularName": "daily",
+    "pluralName": "dailies",
+    "displayName": "Daily"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "post_date": {
+      "type": "date"
+    },
+    "data": {
+      "type": "json"
+    }
+  }
+}

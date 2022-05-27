@@ -7,13 +7,14 @@
 const moment = require('moment');
 const { createCoreController } = require('@strapi/strapi').factories;
 
+const tf2 = '2Min'
 const tf5 = '5Min'
 const tf15 = '15Min'
 
 const timefrom = (timeframe) => {
-    if (timeframe === tf5)
-        return moment().subtract(5, 'minutes');
-    return moment().subtract(15, 'minutes');
+    if (timeframe === tf15)
+        return moment().subtract(15, 'minutes');
+    return moment().subtract(5, 'minutes');
 }
 
 module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => ({
@@ -48,6 +49,15 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
                         $and: [
                             { datatype: datatype },
                             { timeframe: tf5 },
+                            {
+                                data_at: { $gt: timefrom(tf5).toISOString() },
+                            },
+                        ]
+                    },
+                    {
+                        $and: [
+                            { datatype: datatype },
+                            { timeframe: tf2 },
                             {
                                 data_at: { $gt: timefrom(tf5).toISOString() },
                             },
