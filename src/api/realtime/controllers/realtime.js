@@ -13,7 +13,7 @@ const tf5 = '5Min'
 const tf15 = '15Min'
 
 const timefrom = (timeframe, enddate = null) => {
-    const onedate = enddate === null ? moment() : moment.tz(enddate, 'Etc/GMT');
+    const onedate = enddate === null ? moment() : moment(enddate);
     switch(timeframe) {
         case tf2:
             return onedate.subtract(2, 'minutes');
@@ -27,7 +27,7 @@ const timefrom = (timeframe, enddate = null) => {
 }
 
 const timeto = (enddate = null) => {
-    const onedate = enddate === null ? moment() : moment.tz(enddate, 'Etc/GMT');
+    const onedate = enddate === null ? moment() : moment(enddate);
     return onedate;
 }
 
