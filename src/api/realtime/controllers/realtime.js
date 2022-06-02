@@ -1,5 +1,6 @@
 'use strict';
 
+const { default: entityService } = require('@strapi/strapi/lib/services/entity-service');
 /**
  *  realtime controller
  */
@@ -85,10 +86,31 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
     },
 
     async findOne(ctx) {
+        const codeFilter = process.env.REALTIME_BITWISE_CODE;
         const { id } = ctx.params;
         const datatype = 'VSA';
         const enddate = id;
         const readFrom = timefrom(tf5, enddate);
+        const singleSetup = (entity) => {
+            return function(filter) {
+                return entity.data[filter.var] & filter.key ? filter.value : '';
+            }
+        }
+        const showSetups = (entities, filters) => {
+            const setups = entities.map(entity => {
+                const signals = filters.map(singleSetup(entity));
+                entity['singals'] = signals;
+                return entity;
+            })
+            return setups;
+        }
+        const prettyPrint = (entities) => {
+            const pretty = entities.map(entity => {
+                const row = `${entity.symbol}, ${entity.timeframe} ,${entity.singals.join(',')}`;
+                return row;
+            })
+            return pretty;
+        }
         const entities = await strapi.entityService.findMany('api::realtime.realtime', {
             filters: {
                 $or: [
@@ -132,8 +154,12 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
             },
             sort: [{ symbol: 'asc' }, { createdAt: 'desc' }],
         });
-        const sanitizedEntity = await this.sanitizeOutput(entities, ctx);
-        return this.transformResponse(sanitizedEntity);
+        const filters = JSON.parse(codeFilter);
+        const data = showSetups(entities, filters);
+        const pretty = prettyPrint(data);
+        return pretty;
+        // const sanitizedEntity = await this.sanitizeOutput(pretty, ctx);
+        // return this.transformResponse(sanitizedEntity);
     },
 
     async create(ctx) {
