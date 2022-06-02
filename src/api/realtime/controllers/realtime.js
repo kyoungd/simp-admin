@@ -5,16 +5,30 @@
  */
 
 const moment = require('moment');
+require('moment-timezone');
 const { createCoreController } = require('@strapi/strapi').factories;
 
 const tf2 = '2Min'
 const tf5 = '5Min'
 const tf15 = '15Min'
 
-const timefrom = (timeframe) => {
-    if (timeframe === tf15)
-        return moment().subtract(15, 'minutes');
-    return moment().subtract(5, 'minutes');
+const timefrom = (timeframe, enddate = null) => {
+    const onedate = enddate === null ? moment() : moment.tz(enddate, 'Etc/GMT');
+    switch(timeframe) {
+        case tf2:
+            return onedate.subtract(2, 'minutes');
+        case tf5:
+            return onedate.subtract(5, 'minutes');
+        case tf15:
+            return onedate.subtract(15, 'minutes');
+        default:
+            return onedate.subtract(5, 'minutes');
+    }
+}
+
+const timeto = (enddate = null) => {
+    const onedate = enddate === null ? moment() : moment.tz(enddate, 'Etc/GMT');
+    return onedate;
 }
 
 module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => ({
@@ -34,7 +48,6 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
         
         const entities = await strapi.entityService.findMany('api::realtime.realtime', {
             filters: {
-                
                 $or: [
                     {
                         $and: [
@@ -59,7 +72,59 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
                             { datatype: datatype },
                             { timeframe: tf2 },
                             {
-                                data_at: { $gt: timefrom(tf5).toISOString() },
+                                data_at: { $gt: timefrom(tf2).toISOString() },
+                            },
+                        ]
+                    }
+                ]
+            },
+            sort: [{ symbol: 'asc' }, { createdAt: 'desc' }],
+        });
+        const sanitizedEntity = await this.sanitizeOutput(entities, ctx);
+        return this.transformResponse(sanitizedEntity);
+    },
+
+    async findOne(ctx) {
+        const { id } = ctx.params;
+        const datatype = 'VSA';
+        const enddate = id;
+        const readFrom = timefrom(tf5, enddate);
+        const entities = await strapi.entityService.findMany('api::realtime.realtime', {
+            filters: {
+                $or: [
+                    {
+                        $and: [
+                            { datatype: datatype },
+                            { timeframe: tf15 },
+                            {
+                                $and: [
+                                    { data_at: { $gt: timefrom(tf15, enddate).toISOString() } },
+                                    { data_at: { $lte: timeto(enddate).toISOString() } }
+                                ]
+                            },
+                        ]
+                    },
+                    {
+                        $and: [
+                            { datatype: datatype },
+                            { timeframe: tf5 },
+                            {
+                                $and: [
+                                    { data_at: { $gt: timefrom(tf5, enddate).toISOString() } },
+                                    { data_at: { $lte: timeto(enddate).toISOString() } }
+                                ]
+                            },
+                        ]
+                    },
+                    {
+                        $and: [
+                            { datatype: datatype },
+                            { timeframe: tf2 },
+                            {
+                                $and: [
+                                    { data_at: { $gt: timefrom(tf2, enddate).toISOString() } },
+                                    { data_at: { $lte: timeto(enddate).toISOString() } }
+                                ]
                             },
                         ]
                     }
