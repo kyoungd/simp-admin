@@ -12,9 +12,11 @@ const { createCoreController } = require('@strapi/strapi').factories;
 const tf2 = '2Min'
 const tf5 = '5Min'
 const tf15 = '15Min'
+// const timezone = 'Etc/GMT';
+const timezone = 'America/Los_Angeles';
 
 const timefrom = (timeframe, enddate = null) => {
-    const onedate = enddate === null ? moment() : moment(enddate);
+    const onedate = enddate === null ? moment() : moment.tz(enddate, timezone);
     switch(timeframe) {
         case tf2:
             return onedate.subtract(2, 'minutes');
@@ -28,7 +30,7 @@ const timefrom = (timeframe, enddate = null) => {
 }
 
 const timeto = (enddate = null) => {
-    const onedate = enddate === null ? moment() : moment(enddate);
+    const onedate = enddate === null ? moment() : moment.tz(enddate, timezone);
     return onedate;
 }
 
@@ -111,6 +113,10 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
             })
             return pretty;
         }
+        const enddt = timeto(enddate).toISOString();
+        const s15 = timefrom(tf15, enddate).toISOString();
+        const s5 = timefrom(tf5, enddate).toISOString();
+        const s2 = timefrom(tf2, enddate).toISOString();
         const entities = await strapi.entityService.findMany('api::realtime.realtime', {
             filters: {
                 $or: [
@@ -118,36 +124,24 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
                         $and: [
                             { datatype: datatype },
                             { timeframe: tf15 },
-                            {
-                                $and: [
-                                    { data_at: { $gt: timefrom(tf15, enddate).toISOString() } },
-                                    { data_at: { $lte: timeto(enddate).toISOString() } }
-                                ]
-                            },
+                            { data_at: { $gt: s15 } },
+                            { data_at: { $lte: enddt } }
                         ]
                     },
                     {
                         $and: [
                             { datatype: datatype },
                             { timeframe: tf5 },
-                            {
-                                $and: [
-                                    { data_at: { $gt: timefrom(tf5, enddate).toISOString() } },
-                                    { data_at: { $lte: timeto(enddate).toISOString() } }
-                                ]
-                            },
-                        ]
+                            { data_at: { $gt: s5 } },
+                            { data_at: { $lte: enddt } }
+                       ]
                     },
                     {
                         $and: [
                             { datatype: datatype },
                             { timeframe: tf2 },
-                            {
-                                $and: [
-                                    { data_at: { $gt: timefrom(tf2, enddate).toISOString() } },
-                                    { data_at: { $lte: timeto(enddate).toISOString() } }
-                                ]
-                            },
+                            { data_at: { $gt: s2 } },
+                            { data_at: { $lte: enddt } }
                         ]
                     }
                 ]
