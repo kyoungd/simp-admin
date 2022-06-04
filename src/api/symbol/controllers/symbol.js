@@ -32,6 +32,12 @@ module.exports = createCoreController('api::symbol.symbol', ({ strapi }) => ({
                 data: body,
             },
         });
+        const entry2 = await strapi.entityService.create('api::symbol.symbol', {
+            data: {
+                name: 'daily',
+                data: body,
+            },
+        });
         const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
         return this.transformResponse(sanitizedEntity);
     }

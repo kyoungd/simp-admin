@@ -159,6 +159,7 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
     async create(ctx) {
         const { body } = ctx.request;
 
+        const data_at = ('date' in ctx.query ? ctx.query.date : moment().toISOString());
         const getData = (row) => {
             try {
                 delete row['datatype'];
@@ -184,7 +185,7 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
                     "timeframe": timeframe,
                     "symbol": symbol,
                     "data": data,
-                    "data_at": new Date()
+                    "data_at": data_at
                 }
             });
         }
