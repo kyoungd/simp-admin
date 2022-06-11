@@ -108,7 +108,7 @@ module.exports = createCoreController('api::realtime.realtime', ({ strapi }) => 
         }
         const prettyPrint = (entities) => {
             const pretty = entities.map(entity => {
-                const row = `${entity.symbol} : ${entity.timeframe} - ${entity.singals.join(',')}`;
+                const row = `${entity.symbol} : ${entity.timeframe} - ${entity.singals.join(',')} - ${entity.data_at}`;
                 return row;
             })
             return pretty;
