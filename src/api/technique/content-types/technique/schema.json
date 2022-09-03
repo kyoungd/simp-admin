@@ -1,0 +1,88 @@
+{
+  "kind": "collectionType",
+  "collectionName": "techniques",
+  "info": {
+    "singularName": "technique",
+    "pluralName": "techniques",
+    "displayName": "Technique",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "owner": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "summary": {
+      "type": "string"
+    },
+    "photo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "video": {
+      "type": "string"
+    },
+    "price": {
+      "type": "decimal",
+      "default": 99.99
+    },
+    "sales_price": {
+      "type": "decimal"
+    },
+    "is_on_sale": {
+      "type": "boolean",
+      "default": false
+    },
+    "description": {
+      "type": "text"
+    },
+    "technique_details": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::technique-detail.technique-detail",
+      "mappedBy": "technique"
+    },
+    "access": {
+      "type": "enumeration",
+      "enum": [
+        "free",
+        "paid",
+        "special"
+      ],
+      "default": "paid"
+    },
+    "techName": {
+      "type": "string"
+    },
+    "techSummary": {
+      "type": "string"
+    },
+    "techDescription": {
+      "type": "text"
+    },
+    "techPhoto": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  }
+}

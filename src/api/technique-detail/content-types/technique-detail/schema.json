@@ -1,0 +1,51 @@
+{
+  "kind": "collectionType",
+  "collectionName": "technique_details",
+  "info": {
+    "singularName": "technique-detail",
+    "pluralName": "technique-details",
+    "displayName": "TechniqueDetail",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "sequence": {
+      "type": "integer"
+    },
+    "title": {
+      "type": "string"
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "photo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "description": {
+      "type": "text"
+    },
+    "video": {
+      "type": "string"
+    },
+    "technique": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::technique.technique",
+      "inversedBy": "technique_details"
+    },
+    "summary": {
+      "type": "string"
+    }
+  }
+}

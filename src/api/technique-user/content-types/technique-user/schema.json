@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "technique_users",
+  "info": {
+    "singularName": "technique-user",
+    "pluralName": "technique-users",
+    "displayName": "TechniqueUser"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "technique": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::technique.technique"
+    }
+  }
+}
