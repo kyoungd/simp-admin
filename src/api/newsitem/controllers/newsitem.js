@@ -94,4 +94,8 @@ module.exports = createCoreController('api::newsitem.newsitem', ({ strapi }) => 
         }
     },
 
+    async delete(ctx) {
+        await strapi.db.query('api::newsitem.newsitem').deleteMany({});
+        await strapi.db.query('api::newsstock.newsstock').deleteMany({});
+    }
 }));
