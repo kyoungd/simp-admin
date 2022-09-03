@@ -62,4 +62,5 @@ module.exports = createCoreController('api::technique.technique', ({ strapi }) =
         return this.transformResponse(sanitizedEntity);
     }
 
+
 }));
