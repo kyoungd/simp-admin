@@ -57,3 +57,6 @@ Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/
 <sub>🤫 Psst! [Strapi is hiring](https://strapi.io/careers).</sub>
 
 ## OK
+
+## kill process
+sudo kill -9 $(sudo lsof -t -i:8000)
