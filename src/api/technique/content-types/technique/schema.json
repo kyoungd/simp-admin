@@ -83,6 +83,9 @@
       "allowedTypes": [
         "images"
       ]
+    },
+    "stripePriceId": {
+      "type": "string"
     }
   }
 }
