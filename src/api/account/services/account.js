@@ -16,9 +16,11 @@ module.exports = createCoreService('api::account.account', ({ strapi }) => ({
         });
     },
     getUserAccount(user_id) {
-        return strapi.db.query('api::account.account').findOne({
+        const acct = strapi.db.query('api::account.account').findOne({
             where: { user: user_id },
-        })
+        });
+        if (acct)
+            return acct;
     },
 }));
 
