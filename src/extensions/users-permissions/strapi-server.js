@@ -87,8 +87,17 @@ module.exports = async (plugin) => {
             }
 
             // Import the account service to fetch account details
-            const account = await strapi.service('api::account.account').getUserAccount(user.id);
+            let account = await strapi.service('api::account.account').getUserAccount(user.id);
             // 
+            // keep the account id in the user object
+            if (!account) {
+                // get stripe_id from email address
+                const stripe_customer = await stripe.customers.create({
+                    email: user.email,
+                });
+                account = await strapi.service('api::account.account').newUser(user.id, stripe_customer.id, '');
+            }
+
             return ctx.send({
                 jwt: getService('jwt').issue({ id: user.id }),
                 user: { 
@@ -103,7 +112,14 @@ module.exports = async (plugin) => {
             const user = await getService('providers').connect(provider, ctx.query);
 
             // Import the account service to fetch account details
-            const account = await strapi.service('api::account.account').getUserAccount(user.id);
+            let account = await strapi.service('api::account.account').getUserAccount(user.id);
+            if (!account) {
+                // get stripe_id from email address
+                const stripe_customer = await stripe.customers.create({
+                    email: user.email,
+                });
+                account = await strapi.service('api::account.account').newUser(user.id, stripe_customer.id, '');
+            }
             // 
             return ctx.send({
                 jwt: getService('jwt').issue({ id: user.id }),
