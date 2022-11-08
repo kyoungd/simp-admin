@@ -264,7 +264,7 @@ module.exports = createCoreController('api::account.account', ({ strapi }) => ({
             classes: [
                 {
                     name: "math",
-                    notifications: ["1-15:30", "2-9:00"],
+                    notifications: ["9:30-10:45"],
                     voice_channel: null,
                     text_channel: null,
                     category_channel: null,
@@ -279,7 +279,7 @@ module.exports = createCoreController('api::account.account', ({ strapi }) => ({
                 },
                 {
                     name: "english",
-                    notifications: ["1-10:30", "2-09:00"],
+                    notifications: ["09:30-11:00", "15:30-16:30"],
                     voice_channel: null,
                     text_channel: null,
                     category_channel: null,
