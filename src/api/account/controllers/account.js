@@ -64,6 +64,24 @@ function createDiscordRoomJson(accounts, prices, techniques, subscriptions) {
     return discordRooms;
 }
 
+function mergeChannelResult(accounts, channel, subscriptions, techniques) {
+    const result = {
+        channelId: channel.id,
+        room: channel.name,
+        summary: channel.summary,
+        stripePriceId: channel.stripePriceId,
+    };
+    const customers = _.map(subscriptions.data, 'customer');
+    const students = accounts.map(account => {
+        if (customers.includes(account.stripeId)) {
+            return { username: account.user.username, email: account.user.email, displayName: account.user.displayName };
+        }
+    });
+    result.students = students;
+    console.log(result);
+    return result;
+}
+
 module.exports = createCoreController('api::account.account', ({ strapi }) => ({
 
     async getAvailableServices(ctx) {
@@ -184,6 +202,97 @@ module.exports = createCoreController('api::account.account', ({ strapi }) => ({
             console.log(err);
         }
 
+    },
+
+    // get channels the user is teaching
+    // get start time and end time for today
+    // convert stripe-customer-id to user-id and discord-id
+    // create a single json object with all the data
+    // return json object
+    async getExpertSubscriptions (ctx) {
+        try {
+            const result = [];
+            const { id } = ctx.state.user;
+            const channels = await strapi.db.query('api::technique.technique').findMany({
+                where: { owner: id },
+                populate: {
+                    owner: true,
+                }
+            });
+            for (const channel of channels) {
+                // get students in channels
+                const subscriptions = await stripe.subscriptions.list({
+                    price: channel.stripePriceId,
+                    status: 'active',
+                    expand: ["data.default_payment_method"],
+                });
+                const techniques = await strapi.db.query('api::technique.technique').findMany({
+                    where: { stripePriceId: channel.stripePriceId },
+                });
+                const customers = _.map(subscriptions.data, 'customer');
+                const accounts = await strapi.db.query('api::account.account').findMany({
+                    where: {
+                        stripeId: {
+                            $in: customers
+                        }
+                    },
+                    populate: {
+                        user: true,
+                    }
+                });
+                const chan = mergeChannelResult(accounts, channel, subscriptions, techniques);
+                result.push(chan);
+            }
+            const entity = { result : result }
+            const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
+            return this.transformResponse(sanitizedEntity);
+        } catch(err) {
+            console.log(err);
+            return (err);
+        }
+    },
+
+    async getDailyDiscordRooms (cts) {
+        const data = {
+            discord_token: "NzYyNDI4NTQ1MjIxMjYzMzkw.GTA6ao.vbJBA-uxl0W_3TecL1FQOAlKUn8KPBJDV9ikXM",
+            prefix: "!",
+            debug_guilds: [
+                123456789
+            ],
+            owner_id: 9876543221,
+            main_guild_id: 1033463361750450297,
+            classes: [
+                {
+                    name: "math",
+                    notifications: ["1-15:30", "2-9:00"],
+                    voice_channel: null,
+                    text_channel: null,
+                    category_channel: null,
+                    id: null,
+                    leader: [
+                        762428545221263390
+                    ],
+                    users: [
+                        1038629302608076990,
+                        1033486875287093249
+                    ]
+                },
+                {
+                    name: "english",
+                    notifications: ["1-10:30", "2-09:00"],
+                    voice_channel: null,
+                    text_channel: null,
+                    category_channel: null,
+                    leader: [
+                        762428545221263390
+                    ],
+                    users: [
+                        1033486875287093249
+                    ]
+                }
+            ]
+        };
+        return data;
     },
 
 }));

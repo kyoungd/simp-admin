@@ -25,5 +25,15 @@ module.exports = {
             path: "/get-discord-rooms",
             handler: "account.getDiscordRooms",
         },
+        {
+            method: "GET",
+            path: "/get-expert-subscriptions",
+            handler: "account.getExpertSubscriptions",
+        },
+        {
+            method: "GET",
+            path: "/get-daily-discord-room",
+            handler: "account.getDailyDiscordRooms",
+        },
     ],
 };
