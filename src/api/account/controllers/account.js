@@ -4,82 +4,27 @@
  * account controller
  */
 const _ = require('lodash');
+const { createDiscordRoomJson, mergeChannelResult} = require('../generateDiscordConfig'); ;
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const { createCoreController } = require('@strapi/strapi').factories;
 
-function createDiscordRoomJson(accounts, prices, techniques, subscriptions) {
-    const subscription1 = [];
-    for (const row of subscriptions.data) {
-        const { customer, status } = row;
-        const { price } = row.items.data[0];
-        subscription1.push({ customer, priceId: price.id, status });
-    }
-
-    const priceList = [];
-    for (const row of prices.data) {
-        priceList.push({ priceId: row.id, name: row.product.name, livemode: row.livemode });
-    }
-
-    const subscription2 = [];
-    for (const row of subscription1) {
-        const channel = techniques.find(tech => tech.stripePriceId === row.priceId);
-        const { email, displayName, id } = channel.owner;
-        if (channel) {
-            subscription2.push({ ...row, name: channel.name, email, displayName, channelLeaderId: id });
+const getStripeSubscription = async (stripeCustomerId, stat = null) => {
+    const status = ['active', 'past_due', 'unpaid', 'canceled', 'incomplete', 'incomplete_expired', 'trialing', 'all', 'ended'];
+    const validStatus = (stat) => {
+        if (stat && status.includes(stat.toLowerCase())) {
+            return stat.toLowerCase();
+        } else {
+            return 'all';
         }
     }
-
-    const subscription3 = [];
-    for (const row of subscription2) {
-        const account = accounts.find(acc => acc.stripeId === row.customer);
-        if (account) {
-            const { discordId } = account;
-            if (discordId)
-                subscription3.push({ ...row, discordId });
-        }
-    }
-
-    const subscription4 = [];
-    for (const row of subscription3) {
-        const account = accounts.find(acc => acc.user.id === row.channelLeaderId);
-        if (account) {
-            const { discordId } = account;
-            if (discordId)
-                subscription4.push({ ...row, leaderDiscordId: discordId });
-        }
-    }
-
-    const subscription5 = _.groupBy(subscription4, 'priceId');
-    const discordRooms = [];
-    for (const [priceId, rows] of Object.entries(subscription5)) {
-        const leaderDiscordId = rows[0].leaderDiscordId;
-        const channelName = rows[0].name;
-        const students = [];
-        for (const row of rows) {
-            students.push(row.discordId);
-        }
-        discordRooms.push({ priceId, leaderDiscordId, channelName, students });
-    }
-    return discordRooms;
-}
-
-function mergeChannelResult(accounts, channel, subscriptions, techniques) {
-    const result = {
-        channelId: channel.id,
-        room: channel.name,
-        summary: channel.summary,
-        stripePriceId: channel.stripePriceId,
-    };
-    const customers = _.map(subscriptions.data, 'customer');
-    const students = accounts.map(account => {
-        if (customers.includes(account.stripeId)) {
-            return { username: account.user.username, email: account.user.email, displayName: account.user.displayName };
-        }
+    const subscriptionStatus = stat ? stat : 'all';
+    const subscriptions = await stripe.subscriptions.list({
+        customer: stripeCustomerId,
+        status: subscriptionStatus,
+        expand: ["data.default_payment_method"],
     });
-    result.students = students;
-    console.log(result);
-    return result;
+    return subscriptions;
 }
 
 module.exports = createCoreController('api::account.account', ({ strapi }) => ({
@@ -129,20 +74,21 @@ module.exports = createCoreController('api::account.account', ({ strapi }) => ({
             const { query } = ctx.request;
             const account = await strapi.service('api::account.account').getUserAccount(id);
 
-            const status = ['active', 'past_due', 'unpaid', 'canceled', 'incomplete', 'incomplete_expired', 'trialing', 'all', 'ended'];
-            const validStatus = (stat) => {
-                if (status.includes(stat.toLowerCase())) {
-                    return stat.toLowerCase();
-                } else {
-                    return 'all';
-                }
-            }
-            const subscriptionStatus = query['status'] ? validStatus(query['status']) : 'all';
-            const subscriptions = await stripe.subscriptions.list({
-                customer: account.stripeId,
-                status: subscriptionStatus,
-                expand: ["data.default_payment_method"],
-            });
+            const subscriptions = await getStripeSubscription(account.stripeId, query['status']);
+            // const status = ['active', 'past_due', 'unpaid', 'canceled', 'incomplete', 'incomplete_expired', 'trialing', 'all', 'ended'];
+            // const validStatus = (stat) => {
+            //     if (status.includes(stat.toLowerCase())) {
+            //         return stat.toLowerCase();
+            //     } else {
+            //         return 'all';
+            //     }
+            // }
+            // const subscriptionStatus = query['status'] ? validStatus(query['status']) : 'all';
+            // const subscriptions = await stripe.subscriptions.list({
+            //     customer: account.stripeId,
+            //     status: subscriptionStatus,
+            //     expand: ["data.default_payment_method"],
+            // });
 
             // res.json(subscriptions);
             const entity = subscriptions;
@@ -252,6 +198,30 @@ module.exports = createCoreController('api::account.account', ({ strapi }) => ({
         }
     },
 
+    async getSchedule(ctx) {
+        try {
+            const { id } = ctx.state.user;
+
+            const account = await strapi.service('api::account.account').getUserAccount(id);
+            const subscriptions = await getStripeSubscription(account.stripeId, 'active');
+            const results = await Promise.all(subscriptions.data.map(async (sub) => {
+                const technique = await strapi.db.query('api::technique.technique').findMany({
+                    select: ['scheduleEvent'],
+                    where: { stripePriceId: sub.plan.id },
+                });
+                if (technique.length > 0) {
+                    return technique[0].scheduleEvent.map((event) => (
+                        {id: event.id, date: event.date, start: event.start, end: event.end, title: event.title}
+                    ));
+                };
+            }));
+            return results ? results.flat(1) : [];
+        } catch(err) {
+            console.log(err);
+            return (err);
+        }
+    },
+    
     async getDailyDiscordRooms (cts) {
         const data = {
             discord_token: "NzYyNDI4NTQ1MjIxMjYzMzkw.GTA6ao.vbJBA-uxl0W_3TecL1FQOAlKUn8KPBJDV9ikXM",

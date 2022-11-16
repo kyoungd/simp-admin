@@ -35,5 +35,10 @@ module.exports = {
             path: "/get-daily-discord-room",
             handler: "account.getDailyDiscordRooms",
         },
+        {
+            method: "GET",
+            path: "/get-schedule",
+            handler: "account.getSchedule",
+        },
     ],
 };
