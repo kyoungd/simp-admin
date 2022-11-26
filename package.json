@@ -13,6 +13,7 @@
     "@strapi/plugin-i18n": "4.4.1",
     "@strapi/plugin-users-permissions": "4.4.1",
     "@strapi/provider-email-sendgrid": "^4.4.1",
+    "@strapi/provider-upload-cloudinary": "^4.5.2",
     "@strapi/strapi": "4.4.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
@@ -29,8 +30,8 @@
     "uuid": "d3d3d5c2-2e29-4e61-9ca9-5716192a9056"
   },
   "engines": {
-    "node": ">=12.x.x <=16.x.x",
-    "npm": ">=6.0.0"
+    "node": ">=16.x.x <=18.x.x",
+    "npm": ">=8.0.0"
   },
   "license": "MIT"
 }
