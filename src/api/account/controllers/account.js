@@ -29,6 +29,34 @@ const getStripeSubscription = async (stripeCustomerId, stat = null) => {
 
 module.exports = createCoreController('api::account.account', ({ strapi }) => ({
 
+    async find(ctx) {
+        const { id } = ctx.state.user;
+        const entity = await strapi.db.query('api::account.account').findOne({
+            where: { user: id },
+            populate: {
+                user: true,
+                photo: true
+            }
+        });
+        const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
+        return this.transformResponse(sanitizedEntity);
+    },
+
+    async update(ctx) {
+        const { id } = ctx.state.user;
+        const { body } = ctx.request;
+
+        const entry = await strapi.db.query('api::account.account').findOne({
+            where: { user: id },
+        });
+        const newdata = _.merge(entry, body);
+        const entity = await strapi.entityService.update('api::account.account', newdata.id, {
+                data: newdata,
+            });
+        const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
+        return this.transformResponse(sanitizedEntity);
+    },
+
     async getAvailableServices(ctx) {
         const prices = await stripe.prices.list({
             expand: ['data.product']
