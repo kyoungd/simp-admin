@@ -251,14 +251,13 @@ module.exports = createCoreController('api::account.account', ({ strapi }) => ({
     },
     
     async getDailyDiscordRooms (cts) {
+        const ownerId = process.env.DISCORD_OWNER_ID;
+        const guildId = process.env.DISCORD_GUILD_ID;
         const data = {
-            discord_token: "NzYyNDI4NTQ1MjIxMjYzMzkw.GTA6ao.vbJBA-uxl0W_3TecL1FQOAlKUn8KPBJDV9ikXM",
             prefix: "!",
             debug_guilds: [
                 123456789
             ],
-            owner_id: 9876543221,
-            main_guild_id: 1033463361750450297,
             classes: [
                 {
                     name: "math",

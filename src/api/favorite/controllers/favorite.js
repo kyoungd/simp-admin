@@ -28,7 +28,7 @@ module.exports = createCoreController('api::favorite.favorite', ({ strapi }) => 
         const entity = await strapi.db.query('api::favorite.favorite').findOne({
             where: { user: id },
         });
-        const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
+        const sanitizedEntity = await this.sanitizeOutput(entity ? entity : {}, ctx);
         return this.transformResponse(sanitizedEntity);
     },
 
