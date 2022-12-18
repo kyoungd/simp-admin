@@ -60,3 +60,9 @@ Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/
 
 ## kill process
 sudo kill -9 $(sudo lsof -t -i:8000)
+
+## Stripe test account
+4242 4242 4242 4242.
+Use a valid future date, such as 12/34.
+Use any three-digit CVC (four digits for American Express cards).
+Use any value you like for other form fields.

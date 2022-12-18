@@ -119,7 +119,30 @@ module.exports = createCoreController('api::account.account', ({ strapi }) => ({
             // });
 
             // res.json(subscriptions);
-            const entity = subscriptions;
+            //
+            // const entity = subscriptions.data.map((row) => {
+            //     row['plan_id'] = row.plan.id;
+            //     delete row['automatic_tax'];
+            //     delete row['customer'];
+            //     delete row['default_payment_method'];
+            //     delete row['default_tax_rates'];
+            //     delete row['invoice_customer_balance_settings'];
+            //     delete row['items'];
+            //     delete row['payment_settings'];
+            //     delete row['plan'];
+            //     return row;
+            // });
+            //
+            const techList = subscriptions.data.map((row) => row.plan.id);
+            const techs = await strapi.db.query('api::technique.technique').findMany({
+                where: { stripePriceId : { $in: techList } },
+                populate: { technique_details : true },
+            })
+            const entity = techs.map((tech) => {
+                delete tech.scheduleEvent;
+                delete tech.stripePriceId;
+                return tech;
+            })
             const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
             return this.transformResponse(sanitizedEntity);
         } catch (err) {
