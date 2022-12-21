@@ -270,9 +270,13 @@ module.exports = createCoreController('api::account.account', ({ strapi }) => ({
                     where: { stripePriceId: sub.plan.id },
                 });
                 if (technique.length > 0) {
-                    return technique[0].scheduleEvent.map((event) => (
-                        {id: event.id, date: event.date, start: event.start, end: event.end, title: event.title}
-                    ));
+                    const result = [];
+                    const data = technique.map((tech) => {
+                        tech.scheduleTemplate.forEach((schedule) => {
+                            result.push(schedule);
+                        });
+                    })
+                    return result;
                 };
             }));
             return results ? results.flat(1) : [];
