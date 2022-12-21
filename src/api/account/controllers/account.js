@@ -4,6 +4,7 @@
  * account controller
  */
 const _ = require('lodash');
+const moment = require('moment');
 const { createDiscordRoomJson, mergeChannelResult} = require('../generateDiscordConfig'); ;
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
@@ -139,6 +140,13 @@ module.exports = createCoreController('api::account.account', ({ strapi }) => ({
                 populate: { technique_details : true },
             })
             const entity = techs.map((tech) => {
+                const sub = subscriptions.data.find((row) => row.plan.id === tech.stripePriceId);
+                tech['last4'] = sub.default_payment_method.card.last4;
+                tech['current_period_end'] = sub.current_period_end;
+                tech['renewal_date'] = moment(sub.current_period_end * 1000)
+                    .format('YYYY/MM/DD')
+                    .toString();
+                tech['currency'] = sub.plan.currency;
                 delete tech.scheduleEvent;
                 delete tech.stripePriceId;
                 return tech;
