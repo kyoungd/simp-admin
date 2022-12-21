@@ -143,6 +143,7 @@ module.exports = createCoreController('api::account.account', ({ strapi }) => ({
                 const sub = subscriptions.data.find((row) => row.plan.id === tech.stripePriceId);
                 tech['last4'] = sub.default_payment_method.card.last4;
                 tech['current_period_end'] = sub.current_period_end;
+                tech['status'] = sub.status;
                 tech['renewal_date'] = moment(sub.current_period_end * 1000)
                     .format('YYYY/MM/DD')
                     .toString();
