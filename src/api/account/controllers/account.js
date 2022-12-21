@@ -266,7 +266,7 @@ module.exports = createCoreController('api::account.account', ({ strapi }) => ({
             const subscriptions = await getStripeSubscription(account.stripeId, 'active');
             const results = await Promise.all(subscriptions.data.map(async (sub) => {
                 const technique = await strapi.db.query('api::technique.technique').findMany({
-                    select: ['scheduleEvent'],
+                    select: ['scheduleTemplate'],
                     where: { stripePriceId: sub.plan.id },
                 });
                 if (technique.length > 0) {
