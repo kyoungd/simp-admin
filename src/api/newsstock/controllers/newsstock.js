@@ -122,7 +122,7 @@ module.exports = createCoreController('api::newsstock.newsstock', ({ strapi }) =
             },
             orderBy: [{ news_on: 'desc' }],
             populate: true,
-            limit: 10,
+            limit: query['limit'] || 1000,
         });
         for (const news of entity) {
             try {
