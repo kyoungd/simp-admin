@@ -44,5 +44,67 @@ module.exports = createCoreController('api::newsstock.newsstock', ({ strapi }) =
         const santiizedEntity = fetchSummary(entity);
         return this.transformResponse(santiizedEntity);
     },
+
+    async getSentiment(ctx) {
+        const { query } = ctx;
+
+        try {
+            // some logic here
+            // date string 2 weeks ago
+            const timefrom = new Date();
+            timefrom.setDate(timefrom.getDate() - (query['timefrom'] || 21)); // 21 days ago
+            const entity = await strapi.db.query('api::newsstock.newsstock').findMany({
+                where: {
+                    $and: [
+                        { symbol: query['symbol'] },
+                        { news_on: { $gte: timefrom } },
+                    ]
+                },
+                orderBy: [{ news_on: 'desc' }],
+                // populate: true,
+                limit: query['limit'] || 5,
+            });
+            const avgSenti = entity.length <= 0 ? 0 :
+                // array reduce and get average
+                entity.reduce((acc, cur) => {
+                    acc += cur.sentiment;
+                    return acc;
+                    }, 0) / entity.length;
+            return { data: { sentiment: avgSenti }, status_code: 200 };
+        }
+        catch (e) {
+            console.log(e);
+            return { data: { sentiment: 0 }, status_code: 500 };
+        }
+    },
+    
+    async getNews(ctx) {
+        const { query } = ctx;
+
+        // some logic here
+        // date string 2 weeks ago
+        const timefrom = new Date();
+        timefrom.setDate(timefrom.getDate() - (query['timefrom'] || 21)); // 21 days ago
+        const entity = await strapi.db.query('api::newsstock.newsstock').findMany({
+            where: {
+                $and: [
+                    { symbol: query['symbol'] },
+                    { news_on: { $gte: timefrom } },
+                ]
+            },
+            orderBy: [{ news_on: 'desc' }],
+            populate: true,
+            limit: query['limit'] || 5,
+        });
+        const news = entity.map(item => ({
+            news_on: item.news_on,
+            author: item.newsitem.data.author,
+            headline: item.newsitem.data.headline,
+            source: item.newsitem.data.source,
+            summary: item.newsitem.data.summary,
+            url: item.newsitem.data.url,
+        }));
+        return { data: { news }, status_code: 200 };
+    },
     
 }));

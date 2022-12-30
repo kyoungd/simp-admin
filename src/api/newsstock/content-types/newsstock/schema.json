@@ -27,6 +27,9 @@
     },
     "news_on": {
       "type": "datetime"
+    },
+    "sentiment": {
+      "type": "float"
     }
   }
 }

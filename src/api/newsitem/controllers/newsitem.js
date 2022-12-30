@@ -58,7 +58,7 @@ module.exports = createCoreController('api::newsitem.newsitem', ({ strapi }) => 
     async create(ctx) {
         const { body } = ctx.request;
 
-        const { id, symbols, created_at } = body;
+        const { id, symbols, created_at, sentiment } = body;
         const nid = id;
 
         const entity = await strapi.db.query('api::newsstock.newsstock').findOne({
@@ -81,6 +81,7 @@ module.exports = createCoreController('api::newsitem.newsitem', ({ strapi }) => 
                         symbol,
                         news_on: created_at,
                         newsitem: eid,
+                        sentiment,
                         nid,
                     }
                 });
