@@ -9,6 +9,11 @@ module.exports = {
             method: "GET",
             path: "/newsfeed",
             handler: "newsstock.getNews",
+        },
+        {
+            method: "PUT",
+            path: "/fix-sentiment",
+            handler: "newsstock.fixSentiment",
         }
     ],
 };

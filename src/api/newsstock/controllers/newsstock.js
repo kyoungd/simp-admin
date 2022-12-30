@@ -107,4 +107,39 @@ module.exports = createCoreController('api::newsstock.newsstock', ({ strapi }) =
         return { data: { news }, status_code: 200 };
     },
     
+    async fixSentiment(ctx) {
+        const { query } = ctx;
+
+        // date string 2 weeks ago
+        const timefrom = new Date();
+        timefrom.setDate(timefrom.getDate() - (query['timefrom'] || 21)); // 21 days ago
+        const entity = await strapi.db.query('api::newsstock.newsstock').findMany({
+            where: {
+                $and: [
+                    { sentiment: null },
+                    { news_on: { $gte: timefrom } },
+                ]
+            },
+            orderBy: [{ news_on: 'desc' }],
+            populate: true,
+            limit: 10,
+        });
+        for (const news of entity) {
+            try {
+                if (!news.newsitem.data || !news.newsitem.data.sentiment) {
+                    continue;
+                }
+                await strapi.entityService.update('api::newsstock.newsstock', news.id, {
+                    data: {
+                        sentiment: news.newsitem.data.sentiment || 0
+                    }
+                });    
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }
+        return { status_code: 200, data: { count: entity.length} };
+    }
+
 }));
