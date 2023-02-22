@@ -4,7 +4,8 @@
   "info": {
     "singularName": "log",
     "pluralName": "logs",
-    "displayName": "Log"
+    "displayName": "Log",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -18,7 +19,7 @@
       "type": "json"
     },
     "log_message": {
-      "type": "string"
+      "type": "text"
     },
     "section": {
       "type": "string"
